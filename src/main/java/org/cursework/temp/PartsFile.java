@@ -7,7 +7,7 @@ import java.nio.file.Path;
 
 public class PartsFile {
     private long countParts;
-    private File file;
+    private final File file;
 
     public PartsFile(File file) {
         this.file = file;
