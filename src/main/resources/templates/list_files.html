@@ -60,14 +60,12 @@
         <thead>
         <tr>
             <th>File Name</th>
-            <th>Size</th>
             <th>Action</th>
         </tr>
         </thead>
         <tbody>
         <tr th:each="file : ${files}">
             <td th:text="${file}"></td>
-            <td th:text="${filesSize.get(file) + ' mb'}"></td>
             <td><a th:href="@{/download(fileName=${file})}">Download</a></td>
         </tr>
         </tbody>

@@ -1,6 +1,9 @@
 package org.cursework.service;
 
+import org.cursework.storage.FileDirectory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,7 +20,7 @@ import java.util.Objects;
 public class StorageService {
 
     @Value("${path.storage}")
-    public String storageDirectory;
+    private String storageDirectory;
 
     public String getStorageDirectory() {
         return storageDirectory;
@@ -30,8 +33,12 @@ public class StorageService {
             throw new NullPointerException("fileToSave is null");
         }
 
-        Path targetPath = Paths.get(storageDirectory).resolve(fileName).normalize();
-        if (!targetPath.startsWith(Paths.get(storageDirectory).normalize())) {
+        String absolute = FileDirectory.createDirectory(storageDirectory, fileName);
+
+        Path mail = Paths.get(absolute, fileName);
+        Path targetPath = mail.normalize();
+
+        if (!targetPath.startsWith(Paths.get(absolute, fileName).normalize())) {
             throw new SecurityException("Unsupported filename!");
         }
 
@@ -42,13 +49,18 @@ public class StorageService {
         if (fileName == null) {
             throw new NullPointerException("fileName is null");
         }
-        var fileToDownload = new File(storageDirectory + File.separator + fileName);
-        if (!Objects.equals(fileToDownload.getParent(), storageDirectory)) {
+
+        var fileToDownload = new File(Path.of(storageDirectory, fileName, fileName).toString());
+        System.out.println(fileToDownload.getAbsolutePath());
+
+        if (!Objects.equals(fileToDownload.getParent(), Path.of(storageDirectory, fileName).toString())) {
             throw new SecurityException("Unsupported filename!");
         }
+
         if (!fileToDownload.exists()) {
             throw new FileNotFoundException("No file named: " + fileName);
         }
+
         return fileToDownload;
     }
 }

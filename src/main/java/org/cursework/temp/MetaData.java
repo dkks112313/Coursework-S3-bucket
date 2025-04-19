@@ -11,6 +11,8 @@ import java.util.List;
 public class MetaData {
     private String name;
     private double size;
+    private String type;
+
     private List<File> parts;
 
     public MetaData(String name, double size) {
