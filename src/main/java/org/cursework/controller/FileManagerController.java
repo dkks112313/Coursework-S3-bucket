@@ -1,5 +1,6 @@
-package org.cursework.storage;
+package org.cursework.controller;
 
+import org.cursework.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -22,7 +23,7 @@ import java.util.logging.Logger;
 public class FileManagerController {
 
     @Autowired
-    private FileStorageService fileStorageService;
+    private StorageService fileStorageService;
     private static final Logger log = Logger.getLogger(FileManagerController.class.getName());
 
     @PostMapping("/upload-file")

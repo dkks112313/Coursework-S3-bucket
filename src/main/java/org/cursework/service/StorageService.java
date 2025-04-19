@@ -1,4 +1,4 @@
-package org.cursework.storage;
+package org.cursework.service;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Objects;
 
 @Service
-public class FileStorageService {
+public class StorageService {
 
     @Value("${path.storage}")
     public String storageDirectory;

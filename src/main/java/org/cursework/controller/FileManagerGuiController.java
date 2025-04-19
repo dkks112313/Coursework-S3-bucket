@@ -1,5 +1,6 @@
-package org.cursework.storage;
+package org.cursework.controller;
 
+import org.cursework.service.StorageService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,7 +25,7 @@ public class FileManagerGuiController {
 
     @GetMapping("/list-files")
     public String listFiles(Model model) throws IOException {
-        var fileStorage = new FileStorageService();
+        var fileStorage = new StorageService();
         Path currentRelativePath = new File(fileStorage.getStorageDirectory()).toPath();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentRelativePath)) {

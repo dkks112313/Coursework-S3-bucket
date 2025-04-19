@@ -1,4 +1,4 @@
-package org.cursework.parts;
+package org.cursework.temp;
 
 import java.io.File;
 import java.io.IOException;

@@ -7,12 +7,12 @@ import java.io.IOException;
 import java.util.Scanner;
 
 public class FileWork {
-    private String fileName;
+    private String name;
     private File file;
 
-    public FileWork(String fileName) throws IOException {
-        this.fileName = fileName;
-        file = new File(fileName);
+    public FileWork(String name) throws IOException {
+        this.name = name;
+        file = new File(name);
 
         if (file.createNewFile()) {
             System.out.println("File created: " + file.getName());

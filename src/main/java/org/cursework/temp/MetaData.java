@@ -1,4 +1,4 @@
-package org.cursework.network;
+package org.cursework.temp;
 
 import org.json.simple.JSONObject;
 
@@ -8,12 +8,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaDataFile {
+public class MetaData {
     private String name;
     private double size;
     private List<File> parts;
 
-    public MetaDataFile(String name, double size) {
+    public MetaData(String name, double size) {
         this.name = name;
         this.size = size;
         this.parts = new ArrayList<>();
