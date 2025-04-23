@@ -1,17 +1,27 @@
 package org.cursework.storage;
 
-import org.springframework.beans.factory.annotation.Value;
-
 import java.io.File;
 
 public class FileDirectory {
     public static String createDirectory(String fullPath, String originalFilename) {
-        File theDir = new File(fullPath + File.separator + originalFilename);
+        try {
+            if (originalFilename == null || originalFilename.isEmpty()
+                || fullPath == null || fullPath.isEmpty()) {
+                throw new NullPointerException("Exception is null");
+            }
 
-        if (!theDir.exists()){
-            theDir.mkdirs();
+            String newPath = fullPath + File.separator + originalFilename;
+            File theDir = new File(newPath);
+
+            if (!theDir.exists()){
+                theDir.mkdirs();
+            }
+
+            return theDir.getAbsolutePath();
+        } catch (NullPointerException e) {
+            System.err.println(e);
         }
 
-        return theDir.getAbsolutePath();
+        return null;
     }
 }

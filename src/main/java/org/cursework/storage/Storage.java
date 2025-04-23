@@ -1,4 +1,6 @@
-package org.cursework.temp;
+package org.cursework.storage;
+
+import org.cursework.bucket.Bucket;
 
 import java.util.List;
 

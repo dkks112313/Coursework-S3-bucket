@@ -1,19 +1,12 @@
 package org.cursework.service;
 
 import org.cursework.storage.FileDirectory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.io.*;
+import java.nio.file.*;
 import java.util.Objects;
 
 @Service
@@ -24,6 +17,36 @@ public class StorageService {
 
     public String getStorageDirectory() {
         return storageDirectory;
+    }
+
+    public void saveFileInChunks(MultipartFile fileToSave) throws IOException {
+        if (fileToSave == null) {
+            throw new NullPointerException("fileToSave is null");
+        }
+
+        String fileName = fileToSave.getOriginalFilename();
+        String absoluteDir = FileDirectory.createDirectory(storageDirectory, fileName);
+        Path targetDirectory = Paths.get(absoluteDir).normalize();
+
+        if (!targetDirectory.startsWith(Paths.get(absoluteDir).normalize())) {
+            throw new SecurityException("Unsupported filename!");
+        }
+
+        final int CHUNK_SIZE = 1024 * 1024; // 1MB
+        byte[] buffer = new byte[CHUNK_SIZE];
+        int bytesRead;
+        int chunkIndex = 0;
+
+        try (InputStream inputStream = fileToSave.getInputStream()) {
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                String chunkFileName = String.format("%s.part%d", fileName, chunkIndex++);
+                Path chunkPath = targetDirectory.resolve(chunkFileName);
+
+                try (OutputStream outputStream = Files.newOutputStream(chunkPath, StandardOpenOption.CREATE)) {
+                    outputStream.write(buffer, 0, bytesRead);
+                }
+            }
+        }
     }
 
     public void saveFile(MultipartFile fileToSave) throws IOException {
@@ -43,6 +66,35 @@ public class StorageService {
         }
 
         Files.copy(fileToSave.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+    }
+
+    public File getDownloadFileChunks(String fileName) throws Exception {
+        if (fileName == null) {
+            throw new NullPointerException("fileName is null");
+        }
+
+        Path chunkDir = Path.of(storageDirectory, fileName); // директория, где лежат чанки
+        if (!Files.exists(chunkDir) || !Files.isDirectory(chunkDir)) {
+            throw new FileNotFoundException("No chunk directory for: " + fileName);
+        }
+
+        Path assembledPath = Files.createTempFile("assembled-", "-" + fileName);
+        try (OutputStream outputStream = Files.newOutputStream(assembledPath)) {
+            int index = 0;
+            while (true) {
+                Path chunkPath = chunkDir.resolve(fileName + ".part" + index);
+                if (!Files.exists(chunkPath)) break;
+
+                Files.copy(chunkPath, outputStream);
+                index++;
+            }
+
+            if (index == 0) {
+                throw new FileNotFoundException("No chunks found for: " + fileName);
+            }
+        }
+
+        return assembledPath.toFile();
     }
 
     public File getDownloadFile(String fileName) throws Exception {

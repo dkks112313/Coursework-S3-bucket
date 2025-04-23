@@ -1,4 +1,4 @@
-package org.cursework.temp;
+package org.cursework.bucket;
 
 import org.json.simple.JSONObject;
 
