@@ -19,14 +19,14 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@RestController
-public class FileManagerController {
+@RestController("/")
+public class StorageController {
 
     @Autowired
     private StorageService fileStorageService;
-    private static final Logger log = Logger.getLogger(FileManagerController.class.getName());
+    private static final Logger log = Logger.getLogger(StorageController.class.getName());
 
-    @PostMapping("/upload-file")
+    @PostMapping("/api/upload-file")
     public boolean uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             fileStorageService.saveFile(file);
@@ -37,7 +37,7 @@ public class FileManagerController {
         return false;
     }
 
-    @GetMapping("/download")
+    @GetMapping("/api/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String filename) {
         log.log(Level.INFO, "[NORMAL] Download with /download");
         try {

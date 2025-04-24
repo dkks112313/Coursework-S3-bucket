@@ -2,7 +2,7 @@ package org.cursework.bucket;
 
 import java.util.List;
 
-public class Bucket {
+public final class Bucket {
     private String name;
     private List<FileObject> files;
 

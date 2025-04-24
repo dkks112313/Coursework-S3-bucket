@@ -69,7 +69,7 @@
     formData.append('file', fileInput.files[0]);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/upload-file', true);
+    xhr.open('POST', '/api/upload-file', true);
     xhr.onload = function () {
       var statusDiv = document.getElementById('status');
       if (xhr.status === 200) {

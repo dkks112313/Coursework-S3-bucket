@@ -4,9 +4,9 @@ import org.cursework.bucket.Bucket;
 
 import java.util.List;
 
-public class Storage {
-    private String name;
-    private List<Bucket> buckets;
+public final class Storage {
+    private final String name;
+    private final List<Bucket> buckets;
 
     public Storage(String name, List<Bucket> buckets) {
         this.name = name;

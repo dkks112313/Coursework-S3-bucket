@@ -12,7 +12,6 @@ public class MetaData {
     private String name;
     private double size;
     private String type;
-
     private List<File> parts;
 
     public MetaData(String name, double size) {
@@ -40,5 +39,37 @@ public class MetaData {
         }
 
         System.out.println("JSON file created: "+jsonObject);
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public double getSize() {
+        return size;
+    }
+
+    public void setSize(double size) {
+        this.size = size;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public List<File> getParts() {
+        return parts;
+    }
+
+    public void setParts(List<File> parts) {
+        this.parts = parts;
     }
 }
