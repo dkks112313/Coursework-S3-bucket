@@ -3,14 +3,14 @@ package org.cursework.storage;
 import java.io.File;
 
 public class FileDirectory {
-    public static String createDirectory(String fullPath, String originalFilename) {
+    public static String createDirectory(String fullPath, String directoryName) {
         try {
-            if (originalFilename == null || originalFilename.isEmpty()
+            if (directoryName == null || directoryName.isEmpty()
                 || fullPath == null || fullPath.isEmpty()) {
                 throw new NullPointerException("Exception is null");
             }
 
-            String newPath = fullPath + File.separator + originalFilename;
+            String newPath = fullPath + File.separator + directoryName;
             File theDir = new File(newPath);
 
             if (!theDir.exists()){

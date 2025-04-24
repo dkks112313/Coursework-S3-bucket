@@ -12,7 +12,7 @@ public class MetaData {
     private String name;
     private double size;
     private String type;
-    private List<File> parts;
+    private List<String> parts;
 
     public MetaData(String name, double size) {
         this.name = name;
@@ -63,13 +63,5 @@ public class MetaData {
 
     public void setType(String type) {
         this.type = type;
-    }
-
-    public List<File> getParts() {
-        return parts;
-    }
-
-    public void setParts(List<File> parts) {
-        this.parts = parts;
     }
 }

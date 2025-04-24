@@ -7,10 +7,7 @@ import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -19,14 +16,15 @@ import java.nio.charset.StandardCharsets;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-@RestController("/")
+@RestController
+@RequestMapping("/api")
 public class StorageController {
 
     @Autowired
     private StorageService fileStorageService;
     private static final Logger log = Logger.getLogger(StorageController.class.getName());
 
-    @PostMapping("/api/upload-file")
+    @PostMapping("/upload-file")
     public boolean uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             fileStorageService.saveFile(file);
@@ -37,7 +35,7 @@ public class StorageController {
         return false;
     }
 
-    @GetMapping("/api/download")
+    @GetMapping("/download")
     public ResponseEntity<Resource> downloadFile(@RequestParam("fileName") String filename) {
         log.log(Level.INFO, "[NORMAL] Download with /download");
         try {

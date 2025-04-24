@@ -16,7 +16,7 @@ public class StorageService {
     private String storageDirectory;
 
     public String getStorageDirectory() {
-        return storageDirectory;
+        return Path.of(storageDirectory, "data").toString();
     }
 
     public void saveFileInChunks(MultipartFile fileToSave) throws IOException {
@@ -25,7 +25,7 @@ public class StorageService {
         }
 
         String fileName = fileToSave.getOriginalFilename();
-        String absoluteDir = FileDirectory.createDirectory(storageDirectory, fileName);
+        String absoluteDir = FileDirectory.createDirectory(getStorageDirectory(), fileName);
         Path targetDirectory = Paths.get(absoluteDir).normalize();
 
         if (!targetDirectory.startsWith(Paths.get(absoluteDir).normalize())) {
@@ -56,7 +56,7 @@ public class StorageService {
             throw new NullPointerException("fileToSave is null");
         }
 
-        String absolute = FileDirectory.createDirectory(storageDirectory, fileName);
+        String absolute = FileDirectory.createDirectory(storageDirectory+File.separator+"data", fileName);
 
         Path mail = Paths.get(absolute, fileName);
         Path targetPath = mail.normalize();
@@ -73,7 +73,7 @@ public class StorageService {
             throw new NullPointerException("fileName is null");
         }
 
-        Path chunkDir = Path.of(storageDirectory, fileName); // директория, где лежат чанки
+        Path chunkDir = Path.of(storageDirectory, "data", fileName);
         if (!Files.exists(chunkDir) || !Files.isDirectory(chunkDir)) {
             throw new FileNotFoundException("No chunk directory for: " + fileName);
         }
@@ -102,10 +102,10 @@ public class StorageService {
             throw new NullPointerException("fileName is null");
         }
 
-        var fileToDownload = new File(Path.of(storageDirectory, fileName, fileName).toString());
+        var fileToDownload = new File(Path.of(getStorageDirectory(), fileName, fileName).toString());
         System.out.println(fileToDownload.getAbsolutePath());
 
-        if (!Objects.equals(fileToDownload.getParent(), Path.of(storageDirectory, fileName).toString())) {
+        if (!Objects.equals(fileToDownload.getParent(), Path.of(getStorageDirectory(), fileName).toString())) {
             throw new SecurityException("Unsupported filename!");
         }
 
@@ -115,4 +115,5 @@ public class StorageService {
 
         return fileToDownload;
     }
+
 }
