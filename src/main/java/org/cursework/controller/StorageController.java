@@ -52,4 +52,14 @@ public class StorageController {
         }
     }
 
+    @GetMapping("/delete")
+    public void deleteFile(@RequestParam("fileName") String filename) {
+        log.log(Level.INFO, "[NORMAL] Delete with /delete");
+        try {
+            fileStorageService.deleteFile(filename);
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "Problem with deleting files", e);
+        }
+    }
+
 }

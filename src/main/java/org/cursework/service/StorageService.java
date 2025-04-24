@@ -7,6 +7,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
 import java.nio.file.*;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.Objects;
 
 @Service
@@ -114,6 +115,43 @@ public class StorageService {
         }
 
         return fileToDownload;
+    }
+
+    public static void deleteDirectory(File directory) {
+        File[] contents = directory.listFiles();
+        if (contents != null) {
+            for (File file : contents) {
+                deleteDirectory(file);
+            }
+        }
+        directory.delete();
+    }
+
+    public void deleteFile(String fileName) throws Exception {
+        if (fileName == null) {
+            throw new NullPointerException("fileName is null");
+        }
+
+        var fileToDelete = Path.of(getStorageDirectory(), fileName);
+        if (!Files.exists(fileToDelete)) {
+            throw new FileNotFoundException("No file named: " + fileName);
+        }
+
+        Files.walkFileTree(fileToDelete, new SimpleFileVisitor<>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                    throws IOException {
+                Files.delete(file);
+                return FileVisitResult.CONTINUE;
+            }
+
+            @Override
+            public FileVisitResult postVisitDirectory(Path dir, IOException exc)
+                    throws IOException {
+                Files.delete(dir);
+                return FileVisitResult.CONTINUE;
+            }
+        });
     }
 
 }
