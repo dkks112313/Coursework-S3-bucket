@@ -12,6 +12,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -32,6 +33,17 @@ public class BucketService {
         } else {
             return false;
         }
+    }
+
+    public List<String> getListFileObjects(String bucketName) {
+        List<String> fileObjects = new ArrayList<>();
+        File files = new File(getStorageDataDirectory(), bucketName);
+
+        for(File file : Objects.requireNonNull(files.listFiles())) {
+            fileObjects.add(file.getName());
+        }
+
+        return fileObjects;
     }
 
     public void saveFileObject(String bucketName, MultipartFile fileToSave) throws IOException {

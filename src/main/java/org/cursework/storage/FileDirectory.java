@@ -1,7 +1,6 @@
 package org.cursework.storage;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class FileDirectory {

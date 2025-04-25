@@ -13,6 +13,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,13 @@ public class BucketController {
     @Autowired
     private BucketService bucketService;
     private static final Logger log = Logger.getLogger(StorageController.class.getName());
+
+    @GetMapping
+    public List<String> getListFilesFromBucket(@PathVariable String bucket) {
+        List<String> files = bucketService.getListFileObjects(bucket);
+
+        return files;
+    }
 
     @PostMapping
     public void addFileToBucket(@PathVariable String bucket, @RequestParam("fileName") MultipartFile file) {
