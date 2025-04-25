@@ -13,10 +13,7 @@ public class MainApplication {
         String getStoragePath = env.getProperty("path.storage");
         FileDirectory.createDirectory(getStoragePath, "data");
         FileDirectory.createDirectory(getStoragePath, "keys");
-
         FileDirectory.createDirectory(getStoragePath, "data/main");
-
-        SpringApplication.run(MainApplication.class, args);
     }
 
 }
