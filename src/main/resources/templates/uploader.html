@@ -56,6 +56,8 @@
   <h1>Upload Your File</h1>
   <form id="uploadForm">
     <input type="file" id="fileInput" name="file" required>
+    <input type="text" id="bucketId" name="bucket" required>
+
     <button type="submit">Upload</button>
   </form>
   <div id="status"></div>
@@ -65,11 +67,13 @@
     event.preventDefault();
 
     var fileInput = document.getElementById('fileInput');
+    var bucketInput = document.getElementById('bucketId');
+
     var formData = new FormData();
-    formData.append('file', fileInput.files[0]);
+    formData.append('fileName', fileInput.files[0]);
 
     var xhr = new XMLHttpRequest();
-    xhr.open('POST', '/api/upload-file', true);
+    xhr.open('POST', `/api/${bucketInput.value}`, true);
     xhr.onload = function () {
       var statusDiv = document.getElementById('status');
       if (xhr.status === 200) {

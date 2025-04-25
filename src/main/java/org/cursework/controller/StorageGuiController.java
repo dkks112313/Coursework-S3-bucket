@@ -1,10 +1,12 @@
 package org.cursework.controller;
 
+import org.cursework.service.BucketService;
 import org.cursework.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
 import java.io.IOException;
@@ -19,13 +21,16 @@ public class StorageGuiController {
     @Autowired
     private StorageService fileStorage;
 
+    @Autowired
+    private BucketService fileBucket;
+
     @GetMapping("/uploader")
     public String uploader() {
         return "uploader";
     }
 
     @GetMapping("/list-files")
-    public String listFiles(Model model) throws IOException {
+    public String listBuckets(Model model) throws IOException {
         Path currentRelativePath = new File(fileStorage.getStorageDirectory()).toPath();
 
         try (DirectoryStream<Path> stream = Files.newDirectoryStream(currentRelativePath)) {

@@ -28,7 +28,7 @@ public class BucketService {
 
     private boolean checkBucketIsExist(String bucketName) {
         Path path = Path.of(getStorageDataDirectory(), bucketName);
-        if (Files.exists(path) && !Files.isDirectory(path)) {
+        if (Files.exists(path) && Files.isDirectory(path)) {
             return true;
         } else {
             return false;
@@ -79,7 +79,6 @@ public class BucketService {
         }
 
         var fileToDownload = new File(Path.of(getStorageDataDirectory(), bucketName, fileName, fileName).toString());
-        System.out.println(fileToDownload.getAbsolutePath());
 
         if (!Objects.equals(fileToDownload.getParent(), Path.of(getStorageDataDirectory(), bucketName, fileName).toString())) {
             throw new SecurityException("Unsupported filename!");
