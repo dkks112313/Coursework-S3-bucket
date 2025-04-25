@@ -38,13 +38,13 @@ public class StorageService {
         File folder = new File(getStorageDirectory(), bucketName);
         File[] files = folder.listFiles();
 
-        if (files == null || files.length == 0) {
+        if (files == null) {
            throw new IllegalArgumentException("Bucket does not exist");
         }
 
-        Arrays.stream(files).forEach((file) -> {
-            if(file.getName().equals(bucketName)) file.delete();
-        });
+        if (files.length == 0) {
+            folder.delete();
+        }
     }
 
 }

@@ -17,22 +17,15 @@ public class StorageController {
     private static final Logger log = Logger.getLogger(StorageController.class.getName());
 
     @PostMapping("/create/{bucket}")
-    public boolean createBucket(@PathVariable String bucket) {
-        try {
-            //fileStorageService.saveFile(file);
-            throw new IOException("");
-            //return true;
-        } catch (IOException e) {
-            log.log(Level.SEVERE, "Exception during upload", e);
-        }
-        return false;
+    public void createBucket(@PathVariable String bucket) {
+        fileStorageService.createBucket(bucket);
     }
 
     @DeleteMapping("/delete/{bucket}")
     public void deleteBucket(@PathVariable String bucket) {
         log.log(Level.INFO, "[NORMAL] Delete with /delete");
         try {
-            //fileStorageService.deleteFile(bucket);
+            fileStorageService.deleteBucket(bucket);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Problem with deleting files", e);
         }
