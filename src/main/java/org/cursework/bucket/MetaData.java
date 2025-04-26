@@ -1,14 +1,14 @@
 package org.cursework.bucket;
 
+import org.cursework.json.Json;
 import org.json.simple.JSONObject;
 
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MetaData {
+public class MetaData extends Json {
     private String name;
     private double size;
     private String type;

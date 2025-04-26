@@ -20,6 +20,7 @@ import java.util.Objects;
 public class BucketService {
     @Value("${path.storage}")
     private String storageDirectory;
+
     private Bucket bucket;
 
     public String getStorageDataDirectory() {
