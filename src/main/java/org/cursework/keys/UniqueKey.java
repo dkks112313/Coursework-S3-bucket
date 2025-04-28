@@ -1,16 +1,18 @@
 package org.cursework.keys;
 
-import java.util.UUID;
+import java.security.SecureRandom;
+import java.util.Base64;
 
 public class UniqueKey {
+    private static final int KEY_LENGTH = 32;
     private String key;
 
     public UniqueKey() {
-        key = UUID.randomUUID().toString();
-    }
+        SecureRandom secureRandom = new SecureRandom();
+        byte[] keyBytes = new byte[KEY_LENGTH];
+        secureRandom.nextBytes(keyBytes);
 
-    public UniqueKey(String key) {
-        this.key = key;
+        key = Base64.getUrlEncoder().withoutPadding().encodeToString(keyBytes);
     }
 
     public String getKey() {
