@@ -9,7 +9,7 @@ import org.springframework.core.env.Environment;
 @SpringBootApplication
 public class MainApplication {
 
-    public static void main(String[] args) {
+    private static void init(String[] args) {
         Environment env = SpringApplication.run(MainApplication.class, args).getEnvironment();
         String getStoragePath = env.getProperty("path.storage");
         FileDirectory.createDirectory(getStoragePath, "data");
@@ -18,6 +18,10 @@ public class MainApplication {
 
         UniqueKey key = new UniqueKey();
         FileDirectory.createAndWriteToKeys(getStoragePath, key.getKey());
+    }
+
+    public static void main(String[] args) {
+        init(args);
     }
 
 }
