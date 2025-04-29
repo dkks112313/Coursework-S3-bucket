@@ -31,7 +31,7 @@ public class FileDirectory {
         return null;
     }
 
-    public static void createAndWriteToKeys(String fullPath, String data) {
+    public static void createAndWriteKeysFile(String fullPath, String data) {
         String path = Path.of(fullPath, "keys", "keys.txt").toString();
 
         try {
@@ -46,15 +46,10 @@ public class FileDirectory {
             e.printStackTrace();
         }
 
-        writeToFile(path, data);
+        writeToKeysFile(path, data);
     }
 
-    private static void writeToFile(String fullPath, String data) {
-        File checkFileOnExist = new File(fullPath);
-        if (checkFileOnExist.exists()) {
-            return;
-        }
-
+    private static void writeToKeysFile(String fullPath, String data) {
         try {
             FileWriter myWriter = new FileWriter(fullPath);
             myWriter.write(data);
