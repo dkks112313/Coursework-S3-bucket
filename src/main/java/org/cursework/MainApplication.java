@@ -1,5 +1,6 @@
 package org.cursework;
 
+import org.cursework.keys.UniqueKey;
 import org.cursework.storage.FileDirectory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -14,6 +15,9 @@ public class MainApplication {
         FileDirectory.createDirectory(getStoragePath, "data");
         FileDirectory.createDirectory(getStoragePath, "keys");
         FileDirectory.createDirectory(getStoragePath, "data/main");
+
+        UniqueKey key = new UniqueKey();
+        FileDirectory.createAndWriteToKeys(getStoragePath, key.getKey());
     }
 
 }
