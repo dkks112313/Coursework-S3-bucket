@@ -10,7 +10,6 @@ import java.util.Arrays;
 
 @Service
 public class StorageService {
-
     @Value("${path.storage}")
     private String storageDirectory;
 
@@ -46,5 +45,4 @@ public class StorageService {
             folder.delete();
         }
     }
-
 }

@@ -13,7 +13,6 @@ import java.io.File;
 
 @SpringBootApplication
 public class MainApplication {
-
     public static void main(String[] args) {
         init(args);
 
@@ -39,5 +38,4 @@ public class MainApplication {
             initContext.close();
         }
     }
-
 }
