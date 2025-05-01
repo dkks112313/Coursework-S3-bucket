@@ -1,44 +1,39 @@
 package org.cursework.bucket;
 
 import org.cursework.json.Json;
-import org.json.simple.JSONObject;
 
-import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MetaData extends Json {
     private String name;
-    private double size;
-    private String type;
-    private List<String> parts;
+    private String size;
 
-    public MetaData(String name, double size) {
+    public MetaData(String name, String size) {
+        super(name);
+
         this.name = name;
         this.size = size;
-        this.parts = new ArrayList<>();
     }
 
-    public void createJsonFile() {
-        JSONObject jsonObject = new JSONObject();
+    public void writeMetaFile() {
+        Map<String, String> map = new HashMap<>();
+        map.put("name", name);
+        map.put("size", size);
 
-        jsonObject.put("ID", "1");
-        jsonObject.put("First_Name", "Shikhar");
-        jsonObject.put("Last_Name", "Dhawan");
-        jsonObject.put("Date_Of_Birth", "1981-12-05");
-        jsonObject.put("Place_Of_Birth", "Delhi");
-        jsonObject.put("Country", "India");
+        super.writeToJson(map);
+    }
+
+    public void readMetaFile() {
+        List<String> files = new ArrayList<>();
 
         try {
-            FileWriter file = new FileWriter("E:/output.json");
-            file.write(jsonObject.toJSONString());
-            file.close();
-        } catch (IOException e) {
+            super.readJson(files);
+        } catch (Exception e) {
             e.printStackTrace();
         }
-
-        System.out.println("JSON file created: "+jsonObject);
     }
 
     public String getName() {
@@ -49,19 +44,12 @@ public class MetaData extends Json {
         this.name = name;
     }
 
-    public double getSize() {
+    public String getSize() {
         return size;
     }
 
-    public void setSize(double size) {
+    public void setSize(String size) {
         this.size = size;
     }
 
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
 }

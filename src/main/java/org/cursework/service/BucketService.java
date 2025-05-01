@@ -2,6 +2,7 @@ package org.cursework.service;
 
 import org.cursework.bucket.Bucket;
 import org.cursework.bucket.FileObject;
+import org.cursework.bucket.MetaData;
 import org.cursework.storage.FileDirectory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -49,6 +50,7 @@ public class BucketService {
 
     public void saveFileObject(String bucketName, MultipartFile fileToSave) throws IOException {
         String fileName = fileToSave.getOriginalFilename();
+        long size = fileToSave.getSize();
 
         if (fileToSave == null) {
             throw new NullPointerException("fileToSave is null");
@@ -58,7 +60,11 @@ public class BucketService {
             throw new IllegalArgumentException("Bucket does not exist");
         }
 
-        String absolute = FileDirectory.createDirectory(Paths.get(storageDirectory, "data", bucketName).toString(), fileName);
+        String pathToBucket = Paths.get(storageDirectory, "data", bucketName).toString();
+        String absolute = FileDirectory.createDirectory(pathToBucket, fileName);
+
+        MetaData meta = new MetaData(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
+        meta.writeMetaFile();
 
         Path mail = Paths.get(absolute, fileName);
         Path targetPath = mail.normalize();

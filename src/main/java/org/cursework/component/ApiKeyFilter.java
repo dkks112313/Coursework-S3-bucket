@@ -1,4 +1,4 @@
-package org.cursework.component;
+/*package org.cursework.component;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
@@ -65,3 +65,4 @@ public class ApiKeyFilter extends OncePerRequestFilter {
         }
     }
 }
+*/
