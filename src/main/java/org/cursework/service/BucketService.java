@@ -11,6 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
@@ -66,14 +67,30 @@ public class BucketService {
         MetaData meta = new MetaData(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
         meta.writeMetaFile();
 
-        Path mail = Paths.get(absolute, fileName);
+        /*Path mail = Paths.get(absolute, fileName);
         Path targetPath = mail.normalize();
 
         if (!targetPath.startsWith(Paths.get(absolute, fileName).normalize())) {
             throw new SecurityException("Unsupported filename!");
         }
 
-        Files.copy(fileToSave.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(fileToSave.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);*/
+
+        try (var i = fileToSave.getInputStream()) {
+            byte[] buffer = new byte[1024 * 1024 * 1024];
+            int partNumber = 0;
+            int bytesRead;
+
+            while ((bytesRead = i.read(buffer)) != -1) {
+                Path partPath = Paths.get(absolute, "part." + partNumber);
+                try (OutputStream out = Files.newOutputStream(partPath)) {
+                    out.write(buffer, 0, bytesRead);
+                }
+                partNumber++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     public File getDownloadFileObject(String bucketName, String fileName) throws Exception {

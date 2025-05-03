@@ -9,8 +9,6 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.env.Environment;
 
-import java.io.File;
-
 @SpringBootApplication
 public class MainApplication {
     public static void main(String[] args) {
