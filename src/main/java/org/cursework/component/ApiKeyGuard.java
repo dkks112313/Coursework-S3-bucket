@@ -1,6 +1,5 @@
-/*package org.cursework.component;
+package org.cursework.component;
 
-import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,8 +15,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 @Component
-public class ApiKeyFilter extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(ApiKeyFilter.class);
+public class ApiKeyGuard extends OncePerRequestFilter {
+    private static final Logger logger = LoggerFactory.getLogger(ApiKeyGuard.class);
 
     @Value("${path.storage}")
     private String storagePath;
@@ -64,4 +63,4 @@ public class ApiKeyFilter extends OncePerRequestFilter {
             }
         }
     }
-}*/
+}
