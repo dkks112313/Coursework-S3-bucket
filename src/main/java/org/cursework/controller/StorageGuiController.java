@@ -29,7 +29,7 @@ public class StorageGuiController {
         return "uploader";
     }
 
-    @GetMapping("/list-files")
+    @GetMapping("/list-buckets")
     public String listBuckets(Model model) throws IOException {
         Path currentRelativePath = new File(fileStorage.getStorageDirectory()).toPath();
 
@@ -37,11 +37,24 @@ public class StorageGuiController {
             List<String> fileNames = new ArrayList<>();
 
             for (Path path : stream) {
-                fileNames.add(path.getFileName().toString());
+                String st = path.getFileName().toString();
+                if (!st.equals(".DS_Store")) {
+                    fileNames.add(st);
+                }
             }
 
-            model.addAttribute("files", fileNames);
+            model.addAttribute("buckets", fileNames);
         }
+
+        return "list_buckets";
+    }
+
+    @GetMapping("/{bucket}/list-files")
+    public String listFiles(Model model, @PathVariable String bucket) throws IOException {
+        List<String> fileNames = fileBucket.getListFileObjects(bucket);
+
+        model.addAttribute("bucket", bucket);
+        model.addAttribute("files", fileNames);
 
         return "list_files";
     }
