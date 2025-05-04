@@ -9,6 +9,7 @@ import java.util.Map;
 
 public class MetaData extends Json {
     private String name;
+
     private String size;
 
     public MetaData(String name, String size) {

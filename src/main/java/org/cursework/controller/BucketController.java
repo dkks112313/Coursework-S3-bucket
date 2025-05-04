@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 public class BucketController {
     @Autowired
     private BucketService bucketService;
+
     private static final Logger log = Logger.getLogger(StorageController.class.getName());
 
     @GetMapping

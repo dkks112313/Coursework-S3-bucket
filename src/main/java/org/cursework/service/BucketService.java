@@ -23,6 +23,8 @@ public class BucketService {
 
     private Bucket bucket;
 
+    private final int GB = (int) Math.pow(1024, 3);
+
     public String getStorageDataDirectory() {
         return Path.of(storageDirectory, "data").toString();
     }
@@ -68,7 +70,7 @@ public class BucketService {
         meta.writeMetaFile();
 
         try (var i = fileToSave.getInputStream()) {
-            byte[] buffer = new byte[1024 * 1024 * 1024];
+            byte[] buffer = new byte[GB];
             int partNumber = 0;
             int bytesRead;
 

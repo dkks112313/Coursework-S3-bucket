@@ -5,6 +5,7 @@ import java.util.Base64;
 
 public class UniqueKey {
     private static final int KEY_LENGTH = 32;
+
     private String key;
 
     public UniqueKey() {

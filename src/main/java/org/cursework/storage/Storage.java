@@ -6,6 +6,7 @@ import java.util.List;
 
 public final class Storage {
     private final String name;
+
     private final List<Bucket> buckets;
 
     public Storage(String name, List<Bucket> buckets) {

@@ -4,6 +4,7 @@ import java.io.IOException;
 
 public class FileObject {
     private String key;
+
     private MetaData metaData;
 
     public FileObject(String fileName, MetaData metaData) throws IOException {
