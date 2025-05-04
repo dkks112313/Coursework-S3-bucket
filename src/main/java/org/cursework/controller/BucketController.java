@@ -53,6 +53,7 @@ public class BucketController {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new FileSystemResource(fileToDownload));
         } catch (Exception e) {
+            log.log(Level.SEVERE, "Error while downloading file: " + filename, e);
             return ResponseEntity.notFound().build();
         }
     }

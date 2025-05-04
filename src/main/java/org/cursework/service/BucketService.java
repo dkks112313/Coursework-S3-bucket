@@ -8,13 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -62,19 +60,12 @@ public class BucketService {
         }
 
         String pathToBucket = Paths.get(storageDirectory, "data", bucketName).toString();
-        String absolute = FileDirectory.createDirectory(pathToBucket, fileName);
+
+        String abs = FileDirectory.createDirectory(pathToBucket, fileName);
+        String absolute = FileDirectory.createDirectory(abs, "parts");
 
         MetaData meta = new MetaData(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
         meta.writeMetaFile();
-
-        /*Path mail = Paths.get(absolute, fileName);
-        Path targetPath = mail.normalize();
-
-        if (!targetPath.startsWith(Paths.get(absolute, fileName).normalize())) {
-            throw new SecurityException("Unsupported filename!");
-        }
-
-        Files.copy(fileToSave.getInputStream(), targetPath, StandardCopyOption.REPLACE_EXISTING);*/
 
         try (var i = fileToSave.getInputStream()) {
             byte[] buffer = new byte[1024 * 1024 * 1024];
@@ -102,17 +93,38 @@ public class BucketService {
             throw new IllegalArgumentException("Bucket does not exist");
         }
 
-        var fileToDownload = new File(Path.of(getStorageDataDirectory(), bucketName, fileName, fileName).toString());
-
-        if (!Objects.equals(fileToDownload.getParent(), Path.of(getStorageDataDirectory(), bucketName, fileName).toString())) {
-            throw new SecurityException("Unsupported filename!");
+        Path partsDir = Paths.get(getStorageDataDirectory(), bucketName, fileName, "parts");
+        if (!Files.exists(partsDir) || !Files.isDirectory(partsDir)) {
+            throw new FileNotFoundException("Parts directory not found for file: " + fileName);
         }
 
-        if (!fileToDownload.exists()) {
-            throw new FileNotFoundException("No file named: " + fileName);
+        File assembledFile = File.createTempFile("download-", "-" + fileName);
+        assembledFile.deleteOnExit();
+
+        System.out.println("DEBUG: bucket = " + bucketName + ", file = " + fileName);
+        System.out.println("DEBUG: Looking in path: " + Paths.get(getStorageDataDirectory(), bucketName, fileName, "parts"));
+
+        try (OutputStream outputStream = new FileOutputStream(assembledFile)) {
+            Files.list(partsDir)
+                    .filter(path -> path.getFileName().toString().startsWith("part."))
+                    .sorted(Comparator.comparingInt(path -> {
+                        String name = path.getFileName().toString().replace("part.", "");
+                        return Integer.parseInt(name);
+                    }))
+                    .forEach(partPath -> {
+                        try (InputStream inputStream = Files.newInputStream(partPath)) {
+                            byte[] buffer = new byte[8192];
+                            int bytesRead;
+                            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                                outputStream.write(buffer, 0, bytesRead);
+                            }
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
         }
 
-        return fileToDownload;
+        return assembledFile;
     }
 
     public void deleteFileObject(String bucketName, String fileName) throws Exception {
