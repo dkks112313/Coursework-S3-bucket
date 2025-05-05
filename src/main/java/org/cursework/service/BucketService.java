@@ -21,7 +21,7 @@ public class BucketService {
     private static final Logger LOGGER = Logger.getLogger(BucketService.class.getName());
 
     private static final int UPLOAD_BUFFER_SIZE = 8 * 1024 * 1024;
-    private static final int DOWNLOAD_BUFFER_SIZE = 4 * 1024 * 1024;
+    private static final int DOWNLOAD_BUFFER_SIZE = 16 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
 
     @Value("${path.storage}")
