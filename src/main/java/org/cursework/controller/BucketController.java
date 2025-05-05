@@ -34,6 +34,7 @@ public class BucketController {
 
     @PostMapping
     public void addFileToBucket(@PathVariable String bucket, @RequestParam("fileName") MultipartFile file) {
+        log.log(Level.INFO, "[NORMAL] Add file with /");
         try {
             bucketService.saveFileObject(bucket, file);
         } catch (IOException e) {

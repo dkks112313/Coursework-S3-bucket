@@ -312,7 +312,6 @@ public class BucketService {
         return stats;
     }
 
-    // Геттеры и сеттеры для работы с объектом Bucket
     public Bucket getBucket() {
         return bucket;
     }
