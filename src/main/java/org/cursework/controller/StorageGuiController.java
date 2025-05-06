@@ -38,9 +38,7 @@ public class StorageGuiController {
 
             for (Path path : stream) {
                 String st = path.getFileName().toString();
-                if (!st.equals(".DS_Store")) {
-                    fileNames.add(st);
-                }
+                fileNames.add(st);
             }
 
             model.addAttribute("buckets", fileNames);

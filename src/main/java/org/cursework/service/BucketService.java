@@ -79,12 +79,6 @@ public class BucketService {
         String fileDir = FileDirectory.createDirectory(pathToBucket, fileName);
         String partsDir = FileDirectory.createDirectory(fileDir, "parts");
 
-        File storage = new File(pathToBucket);
-        long freeSpace = storage.getFreeSpace();
-        if (freeSpace < size * 1.1) {
-            throw new IOException("Not enough disk space. Required: " + size + " bytes, available: " + freeSpace + " bytes");
-        }
-
         MetaData meta = new MetaData(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
         meta.writeMetaFile();
 
@@ -102,14 +96,6 @@ public class BucketService {
                     outputStream.flush();
                 }
                 partNumber++;
-
-                Runtime runtime = Runtime.getRuntime();
-                long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-                long maxMemory = runtime.maxMemory();
-                if ((double) usedMemory / maxMemory > 0.7) {
-                    LOGGER.info("Memory usage high (" + (usedMemory/1024/1024) + "MB), suggesting GC run");
-                    System.gc();
-                }
             }
             LOGGER.info("Successfully uploaded file: " + fileName + " in " + partNumber + " parts");
         } catch (Exception e) {
@@ -133,8 +119,6 @@ public class BucketService {
             throw new IOException("Failed to upload file: " + e.getMessage(), e);
         } finally {
             activeOperations.decrementAndGet();
-            buffer = null;
-            System.gc();
         }
     }
 
@@ -175,13 +159,6 @@ public class BucketService {
                 requiredSize += Files.size(part);
             }
 
-            File tempDir = assembledFile.getParentFile();
-            long availableSpace = tempDir.getUsableSpace();
-            if (availableSpace < requiredSize * 1.1) {
-                throw new IOException("Not enough disk space for download. Required: " + requiredSize +
-                        " bytes, available: " + availableSpace + " bytes");
-            }
-
             try (BufferedOutputStream outputStream = new BufferedOutputStream(
                     new FileOutputStream(assembledFile), DOWNLOAD_BUFFER_SIZE)) {
 
@@ -196,17 +173,6 @@ public class BucketService {
                             outputStream.write(buffer, 0, bytesRead);
                         }
                         outputStream.flush();
-                    }
-
-                    Runtime runtime = Runtime.getRuntime();
-                    long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-                    long maxMemory = runtime.maxMemory();
-                    if ((double) usedMemory / maxMemory > 0.7) {
-                        LOGGER.info("Memory usage high during download (" + (usedMemory/1024/1024) +
-                                "MB), suggesting GC run");
-                        buffer = null;
-                        System.gc();
-                        buffer = new byte[DOWNLOAD_BUFFER_SIZE];
                     }
                 }
             }
@@ -224,7 +190,6 @@ public class BucketService {
             throw new IOException("Failed to prepare file for download: " + e.getMessage(), e);
         } finally {
             activeOperations.decrementAndGet();
-            System.gc();
         }
     }
 
