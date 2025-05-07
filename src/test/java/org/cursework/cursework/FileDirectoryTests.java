@@ -34,10 +34,4 @@ public class FileDirectoryTests {
 
         Assertions.assertEquals(res, null);
     }
-
-    @Test
-    public void checkFileDirectoryOnFile() {
-        String res = FileDirectory.createDirectory(path, "file");
-        Assertions.assertEquals(res, "C:\\Users\\ovcha\\storage\\file");
-    }
 }

@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.*;
+import java.nio.ByteBuffer;
+import java.nio.channels.Channels;
+import java.nio.channels.FileChannel;
+import java.nio.channels.ReadableByteChannel;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
@@ -20,7 +24,7 @@ import java.util.logging.Logger;
 public class BucketService {
     private static final Logger LOGGER = Logger.getLogger(BucketService.class.getName());
 
-    private static final int UPLOAD_BUFFER_SIZE = 8 * 1024 * 1024;
+    private static final int UPLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final int DOWNLOAD_BUFFER_SIZE = 16 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
 
@@ -84,41 +88,67 @@ public class BucketService {
 
         activeOperations.incrementAndGet();
 
-        byte[] buffer = new byte[UPLOAD_BUFFER_SIZE];
-        try (InputStream inputStream = new BufferedInputStream(fileToSave.getInputStream(), UPLOAD_BUFFER_SIZE)) {
+        try {
             int partNumber = 0;
-            int bytesRead;
+            long remainingBytes = fileToSave.getSize();
 
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                Path partPath = Paths.get(partsDir, "part." + partNumber);
-                try (OutputStream outputStream = new BufferedOutputStream(Files.newOutputStream(partPath), UPLOAD_BUFFER_SIZE)) {
-                    outputStream.write(buffer, 0, bytesRead);
-                    outputStream.flush();
+            ByteBuffer buffer = ByteBuffer.allocateDirect(Math.min(UPLOAD_BUFFER_SIZE, 1024 * 1024));
+
+            try (InputStream is = fileToSave.getInputStream();
+                 ReadableByteChannel inChannel = Channels.newChannel(is)) {
+
+                while (remainingBytes > 0) {
+                    Path partPath = Paths.get(partsDir, "part." + partNumber);
+
+                    try (FileOutputStream fos = new FileOutputStream(partPath.toFile());
+                         FileChannel outChannel = fos.getChannel()) {
+
+                        buffer.clear();
+
+                        if (buffer.limit() > remainingBytes) {
+                            buffer.limit((int)remainingBytes);
+                        }
+
+                        int bytesRead = inChannel.read(buffer);
+                        if (bytesRead <= 0) break;
+
+                        buffer.flip();
+                        outChannel.write(buffer);
+
+                        remainingBytes -= bytesRead;
+                        partNumber++;
+                    }
                 }
-                partNumber++;
             }
+
+            buffer = null;
             LOGGER.info("Successfully uploaded file: " + fileName + " in " + partNumber + " parts");
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error during file upload: " + fileName, e);
-            try {
-                Files.walkFileTree(Paths.get(fileDir), new SimpleFileVisitor<>() {
-                    @Override
-                    public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-                        Files.delete(file);
-                        return FileVisitResult.CONTINUE;
-                    }
-                    @Override
-                    public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-                        Files.delete(dir);
-                        return FileVisitResult.CONTINUE;
-                    }
-                });
-            } catch (Exception cleanupEx) {
-                LOGGER.log(Level.WARNING, "Failed to clean up after failed upload", cleanupEx);
-            }
+            cleanupFiles(fileDir);
             throw new IOException("Failed to upload file: " + e.getMessage(), e);
         } finally {
             activeOperations.decrementAndGet();
+            fileToSave = null;
+        }
+    }
+
+    private void cleanupFiles(String directory) {
+        try {
+            Files.walkFileTree(Paths.get(directory), new SimpleFileVisitor<>() {
+                @Override
+                public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+                    Files.delete(file);
+                    return FileVisitResult.CONTINUE;
+                }
+                @Override
+                public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+                    Files.delete(dir);
+                    return FileVisitResult.CONTINUE;
+                }
+            });
+        } catch (Exception cleanupEx) {
+            LOGGER.log(Level.WARNING, "Failed to clean up directory: " + directory, cleanupEx);
         }
     }
 
@@ -146,35 +176,58 @@ public class BucketService {
         activeOperations.incrementAndGet();
 
         try {
-            List<Path> sortedParts = Files.list(partsDir)
-                    .filter(path -> path.getFileName().toString().startsWith("part."))
-                    .sorted(Comparator.comparingInt(path -> {
+            int bufferSize = Math.min(DOWNLOAD_BUFFER_SIZE, 4 * 1024 * 1024);
+
+            try (FileOutputStream fos = new FileOutputStream(assembledFile);
+                 FileChannel outputChannel = fos.getChannel()) {
+                int maxPartNumber = -1;
+                try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(partsDir, "part.*")) {
+                    for (Path path : dirStream) {
                         String name = path.getFileName().toString().replace("part.", "");
-                        return Integer.parseInt(name);
-                    }))
-                    .toList();
-
-            long requiredSize = 0;
-            for (Path part : sortedParts) {
-                requiredSize += Files.size(part);
-            }
-
-            try (BufferedOutputStream outputStream = new BufferedOutputStream(
-                    new FileOutputStream(assembledFile), DOWNLOAD_BUFFER_SIZE)) {
-
-                byte[] buffer = new byte[DOWNLOAD_BUFFER_SIZE];
-
-                for (Path partPath : sortedParts) {
-                    try (BufferedInputStream inputStream = new BufferedInputStream(
-                            Files.newInputStream(partPath), DOWNLOAD_BUFFER_SIZE)) {
-
-                        int bytesRead;
-                        while ((bytesRead = inputStream.read(buffer)) != -1) {
-                            outputStream.write(buffer, 0, bytesRead);
+                        try {
+                            int partNumber = Integer.parseInt(name);
+                            maxPartNumber = Math.max(maxPartNumber, partNumber);
+                        } catch (NumberFormatException e) {
+                            LOGGER.warning("Skipping invalid part file: " + path);
                         }
-                        outputStream.flush();
                     }
                 }
+
+                long position = 0;
+                for (int partNum = 0; partNum <= maxPartNumber; partNum++) {
+                    Path partPath = Paths.get(partsDir.toString(), "part." + partNum);
+                    if (!Files.exists(partPath)) {
+                        LOGGER.warning("Missing part file: " + partPath + ", skipping");
+                        continue;
+                    }
+
+                    try (FileInputStream fis = new FileInputStream(partPath.toFile());
+                         FileChannel inputChannel = fis.getChannel()) {
+
+                        long size = inputChannel.size();
+                        if (size == 0) continue;
+
+                        long transferredBytes = 0;
+                        long segmentSize = Math.min(bufferSize, 1024 * 1024);
+
+                        while (transferredBytes < size) {
+                            long bytesToTransfer = Math.min(segmentSize, size - transferredBytes);
+                            long bytes = outputChannel.transferFrom(
+                                    inputChannel,
+                                    position + transferredBytes,
+                                    bytesToTransfer
+                            );
+
+                            if (bytes == 0) break;
+                            transferredBytes += bytes;
+                        }
+
+                        position += transferredBytes;
+                        inputChannel.close();
+                        fis.close();
+                    }
+                }
+                outputChannel.force(true);
             }
 
             LOGGER.info("Successfully assembled file for download: " + fileName +
