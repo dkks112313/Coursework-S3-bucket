@@ -3,7 +3,6 @@ package org.cursework.cursework;
 import org.cursework.storage.FileDirectory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Value;
 
 public class FileDirectoryTests {
     private final String path = "C:\\Users\\ovcha\\storage";
