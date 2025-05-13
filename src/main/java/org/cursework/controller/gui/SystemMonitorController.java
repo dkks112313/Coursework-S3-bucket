@@ -1,4 +1,4 @@
-package org.cursework.controller;
+package org.cursework.controller.gui;
 
 import org.cursework.service.BucketService;
 import org.springframework.beans.factory.annotation.Autowired;

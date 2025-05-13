@@ -27,16 +27,20 @@ public class BucketController {
 
     @GetMapping
     public List<String> getListFilesFromBucket(@PathVariable String bucket) {
-        List<String> files = bucketService.getListFileObjects(bucket);
+        bucketService.performOperationForBucket(bucket);
+
+        List<String> files = bucketService.getListFileObjects();
 
         return files;
     }
 
     @PostMapping
     public void addFileToBucket(@PathVariable String bucket, @RequestParam("fileName") MultipartFile file) {
+        bucketService.performOperationForBucket(bucket);
+
         log.log(Level.INFO, "[NORMAL] Add file with /");
         try {
-            bucketService.saveFileObject(bucket, file);
+            bucketService.saveFileObject(file);
         } catch (IOException e) {
             log.log(Level.SEVERE, "Exception during upload", e);
         }
@@ -44,13 +48,15 @@ public class BucketController {
 
     @GetMapping("/{file}")
     public ResponseEntity<Resource> getFileFromBucket(@PathVariable String bucket, @PathVariable("file") String filename) {
+        bucketService.performOperationForBucket(bucket);
+
         log.log(Level.INFO, "[NORMAL] Download with /download");
         try {
-            var fileToDownload = bucketService.getDownloadFileObject(bucket, filename);
+            var fileToDownload = bucketService.getDownloadFileObject(filename);
             String encodeFileName = URLEncoder.encode(filename, StandardCharsets.UTF_8);
 
             return ResponseEntity.ok()
-                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodeFileName + "\"")
+                    .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''\"" + encodeFileName + "\"")
                     .contentLength(fileToDownload.length())
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new FileSystemResource(fileToDownload));
@@ -62,9 +68,11 @@ public class BucketController {
 
     @DeleteMapping("/{file}")
     public void deleteFileFromBucket(@PathVariable("bucket") String bucket, @PathVariable("file") String fileName) {
+        bucketService.performOperationForBucket(bucket);
+
         log.log(Level.INFO, "[NORMAL] Delete with /delete");
         try {
-            bucketService.deleteFileObject(bucket, fileName);
+            bucketService.deleteFileObject(fileName);
         } catch (Exception e) {
             log.log(Level.SEVERE, "Problem with deleting files", e);
         }

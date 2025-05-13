@@ -26,6 +26,8 @@ public class MainApplication {
             Environment env = initContext.getEnvironment();
             String storagePath = env.getProperty("path.storage");
 
+            FileDirectory.createDirectory(storagePath, "temp");
+
             FileDirectory.createDirectory(storagePath, "data");
             FileDirectory.createDirectory(storagePath, "keys");
             FileDirectory.createDirectory(storagePath, "data/main");

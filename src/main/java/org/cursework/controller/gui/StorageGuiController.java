@@ -1,4 +1,4 @@
-package org.cursework.controller;
+package org.cursework.controller.gui;
 
 import org.cursework.service.BucketService;
 import org.cursework.service.StorageService;
@@ -10,6 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,10 +51,16 @@ public class StorageGuiController {
 
     @GetMapping("/{bucket}/list-files")
     public String listFiles(Model model, @PathVariable String bucket) throws IOException {
-        List<String> fileNames = fileBucket.getListFileObjects(bucket);
+        fileBucket.performOperationForBucket(bucket);
+
+        List<String> fileNames = fileBucket.getListFileObjects();
+
+        List<FileEntry> files = fileNames.stream()
+                .map(name -> new FileEntry(name, URLEncoder.encode(name, StandardCharsets.UTF_8)))
+                .toList();
 
         model.addAttribute("bucket", bucket);
-        model.addAttribute("files", fileNames);
+        model.addAttribute("files", files);
 
         return "list_files";
     }

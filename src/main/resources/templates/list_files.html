@@ -65,8 +65,8 @@
         </thead>
         <tbody>
         <tr th:each="file : ${files}">
-            <td th:text="${file}"></td>
-            <td><a th:href="@{'/api/' + ${bucket} + '/' + ${file}}">Download</a></td>
+            <td th:text="${file.name}"></td>
+            <td><a th:href="@{'/api/' + ${bucket} + '/' + ${file.encodedName}}">Download</a></td>
         </tr>
         </tbody>
     </table>

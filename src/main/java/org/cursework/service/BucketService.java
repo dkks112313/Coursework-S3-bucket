@@ -28,21 +28,29 @@ public class BucketService {
     private static final int DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
 
+    public void performOperationForBucket(String bucketName) {
+        bucket = new Bucket(bucketName);
+        this.bucketName = bucket.getName();
+        LOGGER.info("Operating on bucket: " + bucket.getName());
+    }
+
     @Value("${path.storage}")
     private String storageDirectory;
 
     private Bucket bucket;
+    private FileObject fileObject;
+    private String bucketName;
 
     public String getStorageDataDirectory() {
         return Path.of(storageDirectory, "data").toString();
     }
 
-    private boolean checkBucketIsExist(String bucketName) {
+    private boolean checkBucketIsExist() {
         Path path = Path.of(getStorageDataDirectory(), bucketName);
         return Files.exists(path) && Files.isDirectory(path);
     }
 
-    public List<String> getListFileObjects(String bucketName) {
+    public List<String> getListFileObjects() {
         List<String> fileObjects = new ArrayList<>();
         File files = new File(getStorageDataDirectory(), bucketName);
 
@@ -62,7 +70,7 @@ public class BucketService {
         return fileObjects;
     }
 
-    public void saveFileObject(String bucketName, MultipartFile fileToSave) throws IOException {
+    public void saveFileObject(MultipartFile fileToSave) throws IOException {
         if (fileToSave == null) {
             throw new NullPointerException("fileToSave is null");
         }
@@ -75,7 +83,7 @@ public class BucketService {
         long size = fileToSave.getSize();
         LOGGER.info("Starting upload of file: " + fileName + " (" + size + " bytes) to bucket: " + bucketName);
 
-        if (!checkBucketIsExist(bucketName)) {
+        if (!checkBucketIsExist()) {
             throw new IllegalArgumentException("Bucket does not exist: " + bucketName);
         }
 
@@ -83,8 +91,8 @@ public class BucketService {
         String fileDir = FileDirectory.createDirectory(pathToBucket, fileName);
         String partsDir = FileDirectory.createDirectory(fileDir, "parts");
 
-        MetaData meta = new MetaData(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
-        meta.writeMetaFile();
+        fileObject = new FileObject(Paths.get(storageDirectory, "data", bucketName, fileName).toString(), String.valueOf(size));
+        fileObject.getMetaData().writeMetaFile();
 
         activeOperations.incrementAndGet();
 
@@ -152,12 +160,12 @@ public class BucketService {
         }
     }
 
-    public File getDownloadFileObject(String bucketName, String fileName) throws Exception {
+    public File getDownloadFileObject(String fileName) throws Exception {
         if (fileName == null) {
             throw new NullPointerException("fileName is null");
         }
 
-        if (!checkBucketIsExist(bucketName)) {
+        if (!checkBucketIsExist()) {
             throw new IllegalArgumentException("Bucket does not exist: " + bucketName);
         }
 
@@ -276,12 +284,12 @@ public class BucketService {
         }
     }
 
-    public void deleteFileObject(String bucketName, String fileName) throws Exception {
+    public void deleteFileObject(String fileName) throws Exception {
         if (fileName == null) {
             throw new NullPointerException("fileName is null");
         }
 
-        if (!checkBucketIsExist(bucketName)) {
+        if (!checkBucketIsExist()) {
             throw new IllegalArgumentException("Bucket does not exist: " + bucketName);
         }
 
@@ -338,10 +346,6 @@ public class BucketService {
         this.bucket = bucket;
     }
 
-    public List<FileObject> getBucketFileObjects() {
-        return bucket != null ? bucket.getFiles() : Collections.emptyList();
-    }
-
     public String getBuckedName() {
         return bucket != null ? bucket.getName() : null;
     }
@@ -349,12 +353,6 @@ public class BucketService {
     public void setBucketName(String bucketName) {
         if (bucket != null) {
             bucket.setName(bucketName);
-        }
-    }
-
-    public void setBucketFileObjects(List<FileObject> fileObjects) {
-        if (bucket != null) {
-            bucket.setFiles(fileObjects);
         }
     }
 }

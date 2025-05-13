@@ -4,12 +4,11 @@ import java.io.IOException;
 
 public class FileObject {
     private String key;
-
     private MetaData metaData;
 
-    public FileObject(String fileName, MetaData metaData) throws IOException {
+    public FileObject(String fileName, String size) throws IOException {
         this.key = fileName;
-        this.metaData = metaData;
+        this.metaData = new MetaData(fileName, size);
     }
 
     public String getKey() {

@@ -2,15 +2,12 @@ package org.cursework.bucket;
 
 import org.cursework.json.Json;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MetaData extends Json {
     private String name;
-
     private String size;
+    private Date date;
 
     public MetaData(String name, String size) {
         super(name);
