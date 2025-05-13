@@ -25,7 +25,7 @@ public class BucketService {
     private static final Logger LOGGER = Logger.getLogger(BucketService.class.getName());
 
     private static final int UPLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
-    private static final int DOWNLOAD_BUFFER_SIZE = 16 * 1024 * 1024;
+    private static final int DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
 
     @Value("${path.storage}")
@@ -92,7 +92,7 @@ public class BucketService {
             int partNumber = 0;
             long remainingBytes = fileToSave.getSize();
 
-            ByteBuffer buffer = ByteBuffer.allocateDirect(Math.min(UPLOAD_BUFFER_SIZE, 1024 * 1024));
+            ByteBuffer buffer = ByteBuffer.allocateDirect(UPLOAD_BUFFER_SIZE);
 
             try (InputStream is = fileToSave.getInputStream();
                  ReadableByteChannel inChannel = Channels.newChannel(is)) {
@@ -176,7 +176,7 @@ public class BucketService {
         activeOperations.incrementAndGet();
 
         try {
-            int bufferSize = Math.min(DOWNLOAD_BUFFER_SIZE, 4 * 1024 * 1024);
+            int bufferSize = DOWNLOAD_BUFFER_SIZE;
 
             try (FileOutputStream fos = new FileOutputStream(assembledFile);
                  FileChannel outputChannel = fos.getChannel()) {
