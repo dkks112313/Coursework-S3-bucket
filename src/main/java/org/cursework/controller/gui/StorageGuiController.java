@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,9 +54,17 @@ public class StorageGuiController {
         fileBucket.performOperationForBucket(bucket);
 
         List<String> fileNames = fileBucket.getListFileObjects();
+        List<FileEntry> files;
 
-        List<FileEntry> files = fileNames.stream()
-                .map(name -> new FileEntry(name, URLEncoder.encode(name, StandardCharsets.UTF_8)))
+        files = fileNames.stream()
+                .map(name -> {
+                    try {
+                        return new FileEntry(name, new URI(null, null, name, null)
+                                .toASCIIString());
+                    } catch (URISyntaxException e) {
+                        throw new RuntimeException(e);
+                    }
+                })
                 .toList();
 
         model.addAttribute("bucket", bucket);

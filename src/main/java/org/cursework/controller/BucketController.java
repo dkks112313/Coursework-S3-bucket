@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.net.URI;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -53,7 +54,8 @@ public class BucketController {
         log.log(Level.INFO, "[NORMAL] Download with /download");
         try {
             var fileToDownload = bucketService.getDownloadFileObject(filename);
-            String encodeFileName = URLEncoder.encode(filename, StandardCharsets.UTF_8);
+            String encodeFileName = new URI(null, null, filename, null)
+                    .toASCIIString();
 
             return ResponseEntity.ok()
                     .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename*=UTF-8''\"" + encodeFileName + "\"")
