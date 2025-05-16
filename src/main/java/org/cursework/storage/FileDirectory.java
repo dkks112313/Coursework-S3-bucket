@@ -38,6 +38,7 @@ public class FileDirectory {
             File myObj = new File(path);
             if (myObj.createNewFile()) {
                 System.out.println("File created: " + myObj.getName());
+                //coms
                 writeToKeysFile(path, data);
             } else {
                 System.out.println("File already exists.");
