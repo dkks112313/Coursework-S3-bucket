@@ -38,6 +38,7 @@ public class FileDirectory {
             File myObj = new File(path);
             if (myObj.createNewFile()) {
                 System.out.println("File created: " + myObj.getName());
+                writeToKeysFile(path, data);
             } else {
                 System.out.println("File already exists.");
             }
@@ -45,8 +46,6 @@ public class FileDirectory {
             System.out.println("An error occurred.");
             e.printStackTrace();
         }
-
-        writeToKeysFile(path, data);
     }
 
     private static void writeToKeysFile(String fullPath, String data) {
