@@ -2,6 +2,7 @@ package org.cursework.component;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.cursework.storage.FileDirectory;
@@ -30,7 +31,6 @@ public class ApiKeyGuard extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain)
             throws ServletException, IOException {
-
         if (!initialized) {
             initializeApiKey();
         }
@@ -42,6 +42,16 @@ public class ApiKeyGuard extends OncePerRequestFilter {
         }
 
         String apiKey = request.getHeader("X-API-KEY");
+
+        if (apiKey == null && request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if ("bucket_storage_api_key".equals(cookie.getName())) {
+                    apiKey = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
         if (apiKey == null || !apiKey.equals(validApiKey)) {
             response.setStatus(HttpStatus.UNAUTHORIZED.value());
             response.getWriter().write("Invalid or missing API Key");
@@ -54,7 +64,7 @@ public class ApiKeyGuard extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getRequestURI();
-        return !path.startsWith("/api/");
+        return path.startsWith("/auth");
     }
 
     private void initializeApiKey() {
