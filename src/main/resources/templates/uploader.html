@@ -74,6 +74,7 @@
 
     var xhr = new XMLHttpRequest();
     xhr.open('POST', `/api/${bucketInput.value}`, true);
+
     xhr.onload = function () {
       var statusDiv = document.getElementById('status');
       if (xhr.status === 200) {
