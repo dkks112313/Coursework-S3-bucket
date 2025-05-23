@@ -3,7 +3,7 @@ package org.cursework.keys;
 import java.security.SecureRandom;
 import java.util.Base64;
 
-public class UniqueKey {
+public class UniqueKey implements UniqueKeyOperation {
     private static final int KEY_LENGTH = 32;
 
     private String key;

@@ -4,7 +4,7 @@ import org.cursework.json.Json;
 
 import java.util.*;
 
-public class MetaData extends Json {
+public final class MetaData extends Json {
     private String name;
     private String size;
     private Date date;

@@ -2,7 +2,7 @@ package org.cursework.bucket;
 
 import java.io.IOException;
 
-public class FileObject {
+public final class FileObject {
     private String key;
     private MetaData metaData;
 
