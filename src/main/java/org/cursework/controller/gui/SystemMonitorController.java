@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/system")
 public class SystemMonitorController {
-    private static final Logger LOGGER = Logger.getLogger(SystemMonitorController.class.getName());
+    private static final Logger log = Logger.getLogger(SystemMonitorController.class.getName());
 
     @Autowired
     private BucketService bucketService;
@@ -57,7 +57,7 @@ public class SystemMonitorController {
                         try {
                             tempFilesSize.addAndGet(Files.size(path));
                         } catch (Exception e) {
-                            LOGGER.warning("Error getting size for " + path + ": " + e.getMessage());
+                            log.warning("Error getting size for " + path + ": " + e.getMessage());
                         }
                     });
 

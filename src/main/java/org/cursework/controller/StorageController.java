@@ -10,7 +10,6 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api")
 public class StorageController {
-
     @Autowired
     private StorageService fileStorageService;
     private static final Logger log = Logger.getLogger(StorageController.class.getName());
@@ -29,5 +28,4 @@ public class StorageController {
             log.log(Level.SEVERE, "Problem with deleting files", e);
         }
     }
-
 }

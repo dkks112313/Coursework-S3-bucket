@@ -17,7 +17,7 @@ import java.io.IOException;
 
 @Component
 public class ApiKeyGuard extends OncePerRequestFilter {
-    private static final Logger logger = LoggerFactory.getLogger(ApiKeyGuard.class);
+    private static final Logger log = LoggerFactory.getLogger(ApiKeyGuard.class);
 
     @Value("${path.storage}")
     private String storagePath;
@@ -72,7 +72,7 @@ public class ApiKeyGuard extends OncePerRequestFilter {
             if (!initialized) {
                 try {
                     this.validApiKey = FileDirectory.readFileKey(storagePath);
-                    logger.info("API Key initialized successfully");
+                    log.info("API Key initialized successfully");
                 } finally {
                     initialized = true;
                 }

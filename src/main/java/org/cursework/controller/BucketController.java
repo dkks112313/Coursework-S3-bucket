@@ -46,13 +46,13 @@ public class BucketController {
     }
 
     @GetMapping("/{file}")
-    public ResponseEntity<Resource> getFileFromBucket(@PathVariable String bucket, @PathVariable("file") String filename) {
+    public ResponseEntity<Resource> getFileFromBucket(@PathVariable String bucket, @PathVariable("file") String fileName) {
         bucketService.performOperationForBucket(bucket);
 
         log.log(Level.INFO, "[NORMAL] Download with /download");
         try {
-            var fileToDownload = bucketService.getDownloadFileObject(filename);
-            String encodeFileName = new URI(null, null, filename, null)
+            var fileToDownload = bucketService.getDownloadFileObject(fileName);
+            String encodeFileName = new URI(null, null, fileName, null)
                     .toASCIIString();
 
             return ResponseEntity.ok()
@@ -61,7 +61,7 @@ public class BucketController {
                     .contentType(MediaType.APPLICATION_OCTET_STREAM)
                     .body(new FileSystemResource(fileToDownload));
         } catch (Exception e) {
-            log.log(Level.SEVERE, "Error while downloading file: " + filename, e);
+            log.log(Level.SEVERE, "Error while downloading file: " + fileName, e);
             return ResponseEntity.notFound().build();
         }
     }

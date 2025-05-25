@@ -2,7 +2,6 @@ package org.cursework.service;
 
 import org.cursework.bucket.Bucket;
 import org.cursework.bucket.FileObject;
-import org.cursework.bucket.MetaData;
 import org.cursework.storage.FileDirectory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -22,17 +21,11 @@ import java.util.logging.Logger;
 
 @Service
 public class BucketService {
-    private static final Logger LOGGER = Logger.getLogger(BucketService.class.getName());
+    private static final Logger log = Logger.getLogger(BucketService.class.getName());
 
     private static final int UPLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final int DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
-
-    public void performOperationForBucket(String bucketName) {
-        bucket = new Bucket(bucketName);
-        this.bucketName = bucket.getName();
-        LOGGER.info("Operating on bucket: " + bucket.getName());
-    }
 
     @Value("${path.storage}")
     private String storageDirectory;
@@ -40,6 +33,12 @@ public class BucketService {
     private Bucket bucket;
     private FileObject fileObject;
     private String bucketName;
+
+    public void performOperationForBucket(String bucketName) {
+        bucket = new Bucket(bucketName);
+        this.bucketName = bucket.getName();
+        log.info("Operating on bucket: " + bucket.getName());
+    }
 
     public String getStorageDataDirectory() {
         return Path.of(storageDirectory, "data").toString();
@@ -81,7 +80,7 @@ public class BucketService {
         }
 
         long size = fileToSave.getSize();
-        LOGGER.info("Starting upload of file: " + fileName + " (" + size + " bytes) to bucket: " + bucketName);
+        log.info("Starting upload of file: " + fileName + " (" + size + " bytes) to bucket: " + bucketName);
 
         if (!checkBucketIsExist()) {
             throw new IllegalArgumentException("Bucket does not exist: " + bucketName);
@@ -130,9 +129,9 @@ public class BucketService {
             }
 
             buffer = null;
-            LOGGER.info("Successfully uploaded file: " + fileName + " in " + partNumber + " parts");
+            log.info("Successfully uploaded file: " + fileName + " in " + partNumber + " parts");
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during file upload: " + fileName, e);
+            log.log(Level.SEVERE, "Error during file upload: " + fileName, e);
             cleanupFiles(fileDir);
             throw new IOException("Failed to upload file: " + e.getMessage(), e);
         } finally {
@@ -156,7 +155,7 @@ public class BucketService {
                 }
             });
         } catch (Exception cleanupEx) {
-            LOGGER.log(Level.WARNING, "Failed to clean up directory: " + directory, cleanupEx);
+            log.log(Level.WARNING, "Failed to clean up directory: " + directory, cleanupEx);
         }
     }
 
@@ -174,7 +173,7 @@ public class BucketService {
             throw new FileNotFoundException("Parts directory not found for file: " + fileName);
         }
 
-        LOGGER.info("Starting download assembly of file: " + fileName + " from bucket: " + bucketName);
+        log.info("Starting download assembly of file: " + fileName + " from bucket: " + bucketName);
 
         cleanupTempFiles();
 
@@ -196,7 +195,7 @@ public class BucketService {
                             int partNumber = Integer.parseInt(name);
                             maxPartNumber = Math.max(maxPartNumber, partNumber);
                         } catch (NumberFormatException e) {
-                            LOGGER.warning("Skipping invalid part file: " + path);
+                            log.warning("Skipping invalid part file: " + path);
                         }
                     }
                 }
@@ -205,7 +204,7 @@ public class BucketService {
                 for (int partNum = 0; partNum <= maxPartNumber; partNum++) {
                     Path partPath = Paths.get(partsDir.toString(), "part." + partNum);
                     if (!Files.exists(partPath)) {
-                        LOGGER.warning("Missing part file: " + partPath + ", skipping");
+                        log.warning("Missing part file: " + partPath + ", skipping");
                         continue;
                     }
 
@@ -238,13 +237,13 @@ public class BucketService {
                 outputChannel.force(true);
             }
 
-            LOGGER.info("Successfully assembled file for download: " + fileName +
+            log.info("Successfully assembled file for download: " + fileName +
                     " (size: " + assembledFile.length() + " bytes)");
 
             return assembledFile;
 
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error during file download assembly: " + fileName, e);
+            log.log(Level.SEVERE, "Error during file download assembly: " + fileName, e);
             if (assembledFile.exists()) {
                 assembledFile.delete();
             }
@@ -272,15 +271,15 @@ public class BucketService {
                             if (fileAge > MAX_AGE) {
                                 boolean deleted = Files.deleteIfExists(path);
                                 if (deleted) {
-                                    LOGGER.fine("Deleted old temp file: " + path);
+                                    log.fine("Deleted old temp file: " + path);
                                 }
                             }
                         } catch (IOException e) {
-                            LOGGER.warning("Error cleaning up temp file: " + path + ", " + e.getMessage());
+                            log.warning("Error cleaning up temp file: " + path + ", " + e.getMessage());
                         }
                     });
         } catch (IOException e) {
-            LOGGER.warning("Error during temp files cleanup: " + e.getMessage());
+            log.warning("Error during temp files cleanup: " + e.getMessage());
         }
     }
 
@@ -298,7 +297,7 @@ public class BucketService {
             throw new FileNotFoundException("No file named: " + fileName);
         }
 
-        LOGGER.info("Deleting file: " + fileName + " from bucket: " + bucketName);
+        log.info("Deleting file: " + fileName + " from bucket: " + bucketName);
 
         Files.walkFileTree(fileToDelete, new SimpleFileVisitor<>() {
             @Override
@@ -316,7 +315,7 @@ public class BucketService {
             }
         });
 
-        LOGGER.info("Successfully deleted file: " + fileName);
+        log.info("Successfully deleted file: " + fileName);
     }
 
     public Map<String, Object> getStats() {
