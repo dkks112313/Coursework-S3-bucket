@@ -31,7 +31,7 @@ class StorageGuiControllerTests {
     @Test
     void testUploaderView() throws Exception {
         mockMvc.perform(get("/uploader")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk())
                 .andExpect(view().name("uploader"));
     }
@@ -44,7 +44,7 @@ class StorageGuiControllerTests {
         when(fileBucket.getListFileObjects()).thenReturn(List.of("file1.txt", "file 2.txt"));
 
         mockMvc.perform(get("/" + bucket + "/list-files")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk())
                 .andExpect(view().name("list_files"))
                 .andExpect(model().attribute("bucket", bucket))

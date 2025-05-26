@@ -30,7 +30,7 @@ class StorageControllerTest {
         String bucket = "testBucket";
 
         mockMvc.perform(post("/api/create/{bucket}", bucket)
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk());
 
         verify(fileStorageService, times(1)).createBucket(bucket);
@@ -43,7 +43,7 @@ class StorageControllerTest {
         doThrow(new RuntimeException("Simulated error")).when(fileStorageService).deleteBucket(bucket);
 
         mockMvc.perform(delete("/api/delete/{bucket}", bucket)
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk());
 
         verify(fileStorageService, times(1)).deleteBucket(bucket);

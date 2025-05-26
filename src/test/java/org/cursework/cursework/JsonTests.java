@@ -1,21 +1,31 @@
 package org.cursework.cursework;
 
 import org.cursework.json.Json;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.util.*;
 
 public class JsonTests {
+
     private static Json json;
+    private static File tempDir;
 
     @BeforeAll
-    public static void init() {
-        json = new Json("C:\\Users\\ovcha\\IdeaProjects\\curse-work");
+    public static void init() throws IOException {
+        tempDir = Files.createTempDirectory("json-test-storage").toFile();
+
+        json = new Json(tempDir.getAbsolutePath());
+    }
+
+    @AfterAll
+    public static void cleanUp() {
+        for (File file : Objects.requireNonNull(tempDir.listFiles())) {
+            file.delete();
+        }
+        tempDir.delete();
     }
 
     @Test
@@ -26,37 +36,35 @@ public class JsonTests {
 
         json.writeToJson(map);
 
-        List<String> list = new ArrayList<>();
-        list.add("Anna");
-        list.add("Bebra");
+        List<String> list = Arrays.asList("Anna", "Bebra");
 
         Map<String, String> map1 = new HashMap<>();
         try {
             map1 = json.readJson(list);
         } catch (Exception e) {
             e.printStackTrace();
+            Assertions.fail("Exception occurred during readJson");
         }
 
         Assertions.assertEquals(map, map1);
     }
 
     @Test
-    public void testOnReadJsom() {
-        List<String> list = new ArrayList<>();
-        list.add("Anna");
-        list.add("Bebra");
+    public void testOnReadJson() {
+        List<String> list = Arrays.asList("Anna", "Bebra");
 
-        Map<String, String> map = new HashMap<>();
+        Map<String, String> result = new HashMap<>();
         try {
-            map = json.readJson(list);
+            result = json.readJson(list);
         } catch (Exception e) {
             e.printStackTrace();
+            Assertions.fail("Exception occurred during readJson");
         }
 
-        Map<String, String> st = new HashMap<>();
-        st.put("Anna", "bebra");
-        st.put("Bebra", "bum");
+        Map<String, String> expected = new HashMap<>();
+        expected.put("Anna", "bebra");
+        expected.put("Bebra", "bum");
 
-        Assertions.assertEquals(map, st);
+        Assertions.assertEquals(expected, result);
     }
 }

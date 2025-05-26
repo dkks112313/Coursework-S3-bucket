@@ -12,8 +12,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest
 class MainApplicationTests {
-    private static final String TEST_STORAGE_PATH = "C:\\Users\\ovcha\\IdeaProjects\\curse-work\\bebra";
-
     @Test
     void contextLoads() {
         new SpringApplicationBuilder(MainApplication.class)
@@ -25,10 +23,10 @@ class MainApplicationTests {
     void testInitCreatesDirectoriesAndWritesKey() {
         MainApplication.init(new String[]{});
 
-        File tempDir = new File(TEST_STORAGE_PATH, "temp");
-        File dataDir = new File(TEST_STORAGE_PATH, "data");
-        File keysDir = new File(TEST_STORAGE_PATH, "keys");
-        File dataMainDir = new File(TEST_STORAGE_PATH + "/data", "main");
+        File tempDir = new File(Utils.pathToStorage, "temp");
+        File dataDir = new File(Utils.pathToStorage, "data");
+        File keysDir = new File(Utils.pathToStorage, "keys");
+        File dataMainDir = new File(Utils.pathToStorage + "/data", "main");
 
         assertTrue(tempDir.exists() && tempDir.isDirectory(), "temp directory should exist");
         assertTrue(dataDir.exists() && dataDir.isDirectory(), "data directory should exist");

@@ -5,8 +5,6 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 public class FileDirectoryTests {
-    private final String path = "C:\\Users\\ovcha\\storage";
-
     @Test
     public void checkFullPathOnNull() {
         String res = FileDirectory.createDirectory(null, "file");
@@ -22,14 +20,14 @@ public class FileDirectoryTests {
 
     @Test
     public void checkFileDirectoryOnNull() {
-        String res = FileDirectory.createDirectory(path, null);
+        String res = FileDirectory.createDirectory(Utils.path, null);
 
         Assertions.assertEquals(res, null);
     }
 
     @Test
     public void checkFileDirectoryOnEmpty() {
-        String res = FileDirectory.createDirectory(path, "");
+        String res = FileDirectory.createDirectory(Utils.path, "");
 
         Assertions.assertEquals(res, null);
     }

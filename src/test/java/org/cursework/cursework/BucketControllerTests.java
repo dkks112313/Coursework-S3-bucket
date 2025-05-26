@@ -41,7 +41,7 @@ class BucketControllerTests {
         when(bucketService.getListFileObjects()).thenReturn(List.of("file1.txt", "file2.txt"));
 
         mockMvc.perform(get("/api/testBucket")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0]").value("file1.txt"))
                 .andExpect(jsonPath("$[1]").value("file2.txt"));
@@ -57,7 +57,7 @@ class BucketControllerTests {
                             req.setMethod("POST");
                             return req;
                         })
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk());
 
         verify(bucketService, atLeastOnce()).performOperationForBucket("testBucket");
@@ -72,7 +72,7 @@ class BucketControllerTests {
         when(bucketService.getDownloadFileObject("file.txt")).thenReturn(tempFile);
 
         mockMvc.perform(get("/api/testBucket/file.txt")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk())
                 .andExpect(header().string("Content-Disposition", org.hamcrest.Matchers.containsString("file.txt")))
                 .andExpect(content().contentType(MediaType.APPLICATION_OCTET_STREAM));
@@ -86,7 +86,7 @@ class BucketControllerTests {
         when(bucketService.getDownloadFileObject("nofile.txt")).thenThrow(new RuntimeException("File not found"));
 
         mockMvc.perform(get("/api/testBucket/nofile.txt")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isNotFound());
 
         verify(bucketService, atLeastOnce()).performOperationForBucket("testBucket");
@@ -95,7 +95,7 @@ class BucketControllerTests {
     @Test
     void shouldDeleteFileFromBucket() throws Exception {
         mockMvc.perform(delete("/api/testBucket/file.txt")
-                        .header("X-API-Key", ReadKey.key))
+                        .header("X-API-Key", Utils.key))
                 .andExpect(status().isOk());
 
         verify(bucketService, atLeastOnce()).performOperationForBucket("testBucket");
