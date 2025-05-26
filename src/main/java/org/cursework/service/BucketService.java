@@ -22,7 +22,7 @@ import java.util.logging.Logger;
 @Service
 public class BucketService {
     @Value("${path.storage}")
-    private String storageDirectory;
+    public String storageDirectory;
 
     private static final Logger log = Logger.getLogger(BucketService.class.getName());
 
@@ -44,7 +44,7 @@ public class BucketService {
         return Path.of(storageDirectory, "data").toString();
     }
 
-    private boolean checkBucketIsExist() {
+    public boolean checkBucketIsExist() {
         Path path = Path.of(getStorageDataDirectory(), bucketName);
         return Files.exists(path) && Files.isDirectory(path);
     }

@@ -10,7 +10,7 @@ import java.nio.file.*;
 @Service
 public class StorageService {
     @Value("${path.storage}")
-    private String storageDirectory;
+    public String storageDirectory;
 
     public String getStorageDirectory() {
         return Path.of(storageDirectory, "data").toString();

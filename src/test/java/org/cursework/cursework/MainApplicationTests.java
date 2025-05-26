@@ -16,7 +16,6 @@ class MainApplicationTests {
 
     @Test
     void contextLoads() {
-        // Просто перевірка, що контекст піднімається без помилок
         new SpringApplicationBuilder(MainApplication.class)
                 .web(org.springframework.boot.WebApplicationType.NONE)
                 .run();
@@ -39,12 +38,6 @@ class MainApplicationTests {
         File keysFile = new File(keysDir, "keys.txt");
         assertTrue(keysFile.exists(), "keys.txt file should exist");
         assertTrue(keysFile.length() > 0, "keys.txt file should not be empty");
-    }
-
-    @AfterAll
-    static void cleanup() {
-        // Видалити папку після тестів (рекурсивно)
-        deleteDirectory(new File(TEST_STORAGE_PATH));
     }
 
     private static void deleteDirectory(File directoryToBeDeleted) {
