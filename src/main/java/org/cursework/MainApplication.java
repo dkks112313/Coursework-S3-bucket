@@ -17,7 +17,7 @@ public class MainApplication {
         SpringApplication.run(MainApplication.class, args);
     }
 
-    private static void init(String[] args) {
+    public static void init(String[] args) {
         ConfigurableApplicationContext initContext = new SpringApplicationBuilder(MainApplication.class)
                 .web(WebApplicationType.NONE)
                 .run(args);
