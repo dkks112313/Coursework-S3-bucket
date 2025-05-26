@@ -1,5 +1,7 @@
 package org.cursework.cursework;
 
+import org.cursework.storage.FileDirectory;
+
 public class ReadKey {
-    public static String key = "Q7srj4TMKSUci6sti9CulXufZRJfVtj9I2Tw4VQEJmg";
+    public static String key = FileDirectory.readFileKey("C:\\Users\\ovcha\\IdeaProjects\\curse-work\\bebra");
 }
