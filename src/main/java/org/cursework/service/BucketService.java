@@ -345,7 +345,7 @@ public class BucketService {
         this.bucket = bucket;
     }
 
-    public String getBuckedName() {
+    public String getBucketName() {
         return bucket != null ? bucket.getName() : null;
     }
 

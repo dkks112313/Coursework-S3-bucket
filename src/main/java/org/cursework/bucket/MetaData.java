@@ -49,5 +49,4 @@ public final class MetaData extends Json {
     public void setSize(String size) {
         this.size = size;
     }
-
 }
