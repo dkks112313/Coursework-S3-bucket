@@ -21,14 +21,14 @@ import java.util.logging.Logger;
 
 @Service
 public class BucketService {
+    @Value("${path.storage}")
+    private String storageDirectory;
+
     private static final Logger log = Logger.getLogger(BucketService.class.getName());
 
     private static final int UPLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final int DOWNLOAD_BUFFER_SIZE = 10 * 1024 * 1024;
     private static final AtomicInteger activeOperations = new AtomicInteger(0);
-
-    @Value("${path.storage}")
-    private String storageDirectory;
 
     private Bucket bucket;
     private FileObject fileObject;
@@ -128,7 +128,6 @@ public class BucketService {
                 }
             }
 
-            buffer = null;
             log.info("Successfully uploaded file: " + fileName + " in " + partNumber + " parts");
         } catch (Exception e) {
             log.log(Level.SEVERE, "Error during file upload: " + fileName, e);
@@ -136,7 +135,6 @@ public class BucketService {
             throw new IOException("Failed to upload file: " + e.getMessage(), e);
         } finally {
             activeOperations.decrementAndGet();
-            fileToSave = null;
         }
     }
 
@@ -230,8 +228,6 @@ public class BucketService {
                         }
 
                         position += transferredBytes;
-                        inputChannel.close();
-                        fis.close();
                     }
                 }
                 outputChannel.force(true);
